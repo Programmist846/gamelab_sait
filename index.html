@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameLab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav id="navbar" style="display:none;">
+        <div class="logo" onclick="showPage('feed')">GAME<span>LAB</span></div>
+        <div class="links">
+            <button onclick="showPage('feed')">🏠 Лента</button>
+            <button onclick="showPage('create')">✏️ Создать</button>
+            <button onclick="openMyProfile()">👤 Профиль</button>
+            <button id="adminBtn" onclick="showPage('admin')" style="display:none;">⚙️ Админ</button>
+            <button onclick="doLogout()">🚪 Выход</button>
+        </div>
+    </nav>
+
+    <div class="app">
+        <!-- АВТОРИЗАЦИЯ -->
+        <div id="page-auth" class="page active">
+            <div class="auth-box">
+                <h1>GAME<span>LAB</span></h1>
+                <div class="tabs">
+                    <button class="tab active" onclick="setAuthMode('in')">ВХОД</button>
+                    <button class="tab" onclick="setAuthMode('reg')">РЕГА</button>
+                </div>
+
+                <!-- Вход -->
+                <div id="form-in">
+                    <input type="text" id="in-user" placeholder="Никнейм">
+                    <input type="password" id="in-pass" placeholder="Пароль">
+                    <button class="btn-main" onclick="doLogin()">ВОЙТИ</button>
+                </div>
+
+                <!-- Регистрация -->
+                <div id="form-reg" style="display:none;">
+                    <input type="text" id="reg-user" placeholder="Никнейм">
+                    <input type="password" id="reg-pass" placeholder="Пароль">
+                    
+                    <!-- Загрузка аватарки -->
+                    <label style="display:block; text-align:left; color:#888; font-size:12px; margin-top:10px;">Аватарка (необязательно):</label>
+                    <div style="position:relative; display:inline-block; width:100%;">
+                        <button class="tool-btn" onclick="document.getElementById('reg-avatar').click()" style="width:100%; text-align:center;">
+                            📷 Выбрать фото
+                        </button>
+                        <input type="file" id="reg-avatar" accept="image/*" hidden onchange="previewRegAvatar(this)">
+                    </div>
+                    <!-- Сюда выводится сообщение об успехе -->
+                    <div id="avatar-status"></div>
+
+                    <!-- Правила со ссылками из JS -->
+                    <div class="rules-container">
+                        <label style="cursor:pointer; display:flex; align-items:flex-start;">
+                            <input type="checkbox" id="reg-rules" style="margin-top:3px;"> 
+                            <span>
+                                Я согласен с 
+                                <a href="#" onclick="window.open(RULES_LINK, '_blank'); return false;">Правилами</a> 
+                                и 
+                                <a href="#" onclick="window.open(PRIVACY_LINK, '_blank'); return false;">Политикой конфиденциальности</a>.
+                            </span>
+                        </label>
+                    </div>
+
+                    <button class="btn-sec" onclick="doRegister()">СОЗДАТЬ АКК</button>
+                </div>
+                <p id="msg"></p>
+            </div>
+        </div>
+
+        <!-- ЛЕНТА -->
+        <div id="page-feed" class="page">
+            <div id="posts-list"></div>
+        </div>
+
+        <!-- СОЗДАНИЕ ПОСТА -->
+        <div id="page-create" class="page">
+            <h2>Новый пост</h2>
+            <input type="text" id="post-title" placeholder="Заголовок">
+            
+            <div class="editor-toolbar">
+                <button class="tool-btn" onclick="formatText('b')"><b>B</b></button>
+                <button class="tool-btn" onclick="formatText('i')"><i>I</i></button>
+            </div>
+            <textarea id="post-text" rows="6" placeholder="О чем думаешь?"></textarea>
+            
+            <label class="btn-sec" style="display:block; text-align:center; margin-top:10px;">
+                📷 Добавить фото в пост
+                <input type="file" id="post-image" accept="image/*" hidden onchange="previewImage(this)">
+            </label>
+            <img id="img-preview" style="max-width:100%; display:none; margin-top:10px; border-radius:8px;">
+
+            <button class="btn-main" onclick="sendPost()">ОПУБЛИКОВАТЬ</button>
+        </div>
+
+        <!-- ПРОФИЛЬ -->
+        <div id="page-profile" class="page">
+            <div class="profile-header">
+                <img id="prof-avatar" src="" class="avatar-lg">
+                <h2 id="prof-name">User <span id="prof-verify" class="verified-badge" style="display:none">✔</span></h2>
+                <p id="prof-bio" style="color:#888;">@username</p>
+                <div class="profile-stats">
+                    <span><b id="stat-posts">0</b> Постов</span>
+                    <span><b id="stat-role">User</b></span>
+                </div>
+            </div>
+            
+            <div class="profile-tabs">
+                <div class="p-tab active" id="tab-posts" onclick="switchProfileTab('posts')">Посты</div>
+                <div class="p-tab" id="tab-replies" onclick="switchProfileTab('replies')">Ответы</div>
+            </div>
+            
+            <div id="profile-content-list"></div>
+        </div>
+
+        <!-- АДМИНКА -->
+        <div id="page-admin" class="page">
+            <h2>Админ Панель</h2>
+            <div id="admin-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const INITIAL_USER = {{ user | tojson if user else 'null' }};
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
